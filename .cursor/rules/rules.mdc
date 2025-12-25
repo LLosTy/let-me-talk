@@ -1,0 +1,79 @@
+# Cursor Rules – JavaScript App (2025)
+
+## General Principles
+
+- Prefer **clarity over cleverness**
+- Write **maintainable, readable, and testable** code
+- Optimize for **developer experience first**, performance second
+- Follow modern **ECMAScript standards (ES2023+)**
+
+## JavaScript Standards
+
+- Use **ES Modules** (`import` / `export`)
+- Prefer `const`, use `let` only when reassignment is required
+- Never use `var`
+- Use **arrow functions** for callbacks and small functions
+- Use **async/await** instead of `.then()` chains
+- Avoid deeply nested logic; extract helpers when needed
+
+## Project Structure
+
+- Keep files **small and focused** (≤ 300 lines when possible)
+- One main responsibility per file
+- Group by **feature**, not by file type
+- Avoid circular dependencies
+
+## Naming Conventions
+
+- Use `camelCase` for variables and functions
+- Use `PascalCase` for classes and constructors
+- Use **clear, descriptive names**, avoid abbreviations
+- Boolean variables should start with `is`, `has`, or `should`
+
+## Error Handling
+
+- Never silently ignore errors
+- Use `try/catch` for async logic
+- Throw **custom errors** when appropriate
+- Provide helpful error messages for debugging
+
+## Code Style
+
+- Prefer **early returns** over nested `if` blocks
+- Avoid magic numbers; extract constants
+- Use optional chaining (`?.`) and nullish coalescing (`??`)
+- Keep functions **pure** when possible
+
+## Performance & Safety
+
+- Avoid unnecessary re-renders or recalculations
+- Do not prematurely optimize
+- Validate external input at boundaries
+- Never trust user-provided data
+
+## Comments & Documentation
+
+- Code should be self-explanatory
+- Comment **why**, not **what**
+- Remove outdated or redundant comments
+- Use JSDoc for public functions when helpful
+
+## Tooling Expectations
+
+- Assume modern bundlers (Vite / Turbopack / ESBuild)
+- Assume ESLint + Prettier are present
+- Follow existing project lint and formatting rules
+
+## What to Avoid
+
+- Overengineering
+- Unused code
+- Large untyped objects
+- Copy-pasting without understanding
+
+## AI Assistance Rules
+
+- Do not invent APIs or libraries
+- Ask for clarification if requirements are ambiguous
+- Match existing code style and patterns
+- Prefer minimal, incremental changes
