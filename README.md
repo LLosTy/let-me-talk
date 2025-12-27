@@ -1,6 +1,6 @@
 # Let me talk
 
-A Next.js application.
+A purely vibe-coded app; it's a chess clock like timer for multiple people in order to participate in a conversation in an orderly manner
 
 ## Getting Started
 
