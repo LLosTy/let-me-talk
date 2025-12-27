@@ -166,19 +166,9 @@ export default function SplitScreen() {
       return { time: formatTime(playerTime), jumpIns: remainingJumps };
     }
 
-    // When playing
-    if (playerIndex === currentSpeaker) {
-      // Current speaker: show their time ticking down
-      return { time: formatTime(playerTime), jumpIns: remainingJumps };
-    } else {
-      // Other players: show their remaining time when grace period is over
-      if (gracePeriodActive) {
-        // During grace period, they're grayed out, no time shown
-        return { time: null, jumpIns: remainingJumps };
-      }
-      // Grace period over - show their remaining time
-      return { time: formatTime(playerTime), jumpIns: remainingJumps };
-    }
+    // When playing, always show time for all players (even during grace period)
+    // The grayed-out visual will indicate grace period is active
+    return { time: formatTime(playerTime), jumpIns: remainingJumps };
   };
 
   // Get text position and rotation for a wedge
