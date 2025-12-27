@@ -177,23 +177,18 @@ export default function SplitScreen() {
     const startAngle = -90;
     const middleAngle = startAngle + (index + 0.5) * anglePerWedge;
 
-    // Position text at about 40% of the radius
     const textRadius = radius * 0.4;
     const pos = polarToCartesian(middleAngle, textRadius);
 
-    // Calculate rotation for text to be readable
-    // For SVG, rotation is in degrees and rotates around the point
-    // We want text to follow the angle of the wedge
-    let rotation = middleAngle;
-    // Adjust rotation for readability - flip text on bottom half
-    if (rotation > 90 && rotation < 270) {
-      rotation += 180;
-    }
+    // FIX: Set a consistent rotation for all wedges.
+    // 'middleAngle + 90' usually points the bottom inward.
+    // 'middleAngle - 90' (or + 270) points the bottom outward.
+    const rotation = middleAngle - 90;
 
     return {
       x: pos.x,
       y: pos.y,
-      rotation: rotation,
+      rotation,
     };
   };
 
@@ -203,22 +198,21 @@ export default function SplitScreen() {
     const startAngle = -90;
     const middleAngle = startAngle + (index + 0.5) * anglePerWedge;
 
-    // Position below the time text
+    // Position "base" at the same radius as the main text
     const textRadius = radius * 0.4;
     const basePos = polarToCartesian(middleAngle, textRadius);
 
-    // Offset downward along the angle direction (perpendicular to the radius)
-    const offsetDistance = 35; // pixels
-    const perpAngle = middleAngle + 90; // Perpendicular to the radius
-    const offsetAngle = degToRad(perpAngle);
+    // FIX 1: Ensure rotation matches the main text (bottom facing outward)
+    const rotation = middleAngle - 90;
+
+    // FIX 2: Adjust the offset to align with the new rotation.
+    // To place it inline/next to the text, we move along the rotation angle.
+    // (If you actually want it "below" the text radially, change offsetAngle to use 'middleAngle')
+    const offsetDistance = 35;
+    const offsetAngle = degToRad(rotation); // Move in the direction of the text flow
+
     const offsetX = basePos.x + offsetDistance * Math.cos(offsetAngle);
     const offsetY = basePos.y + offsetDistance * Math.sin(offsetAngle);
-
-    // Same rotation as text
-    let rotation = middleAngle;
-    if (rotation > 90 && rotation < 270) {
-      rotation += 180;
-    }
 
     return {
       x: offsetX,
