@@ -26,17 +26,29 @@ export function GameStateProvider({ children }) {
     setSettings((prev) => ({ ...prev, ...newSettings }));
   }, []);
 
-  // Start game
+  // Start game - uses latest settings to ensure proper initialization
   const startGame = useCallback(() => {
     setGameState("playing");
     setCurrentSpeaker(0);
-    // Initialize each player with their max time (chess clock)
-    setPlayerTimes(Array(settings.playerCount).fill(settings.maxTime));
-    setGracePeriodActive(true);
-    setGracePeriodTime(settings.invulnerabilityPeriod);
-    // Initialize jump-in counts for all players
-    setJumpInCounts(Array(settings.playerCount).fill(settings.jumpInAmount));
-  }, [settings]);
+    // Get the latest settings to ensure arrays are properly sized
+    // Use functional update to read the most recent settings
+    setSettings((currentSettings) => {
+      // Initialize each player with their max time (chess clock)
+      const times = Array(currentSettings.playerCount).fill(
+        currentSettings.maxTime
+      );
+      setPlayerTimes(times);
+      // Initialize jump-in counts for all players
+      const jumps = Array(currentSettings.playerCount).fill(
+        currentSettings.jumpInAmount
+      );
+      setJumpInCounts(jumps);
+      // Set grace period with latest settings
+      setGracePeriodActive(true);
+      setGracePeriodTime(currentSettings.invulnerabilityPeriod);
+      return currentSettings;
+    });
+  }, []);
 
   // Pause game
   const pauseGame = useCallback(() => {
@@ -79,14 +91,21 @@ export function GameStateProvider({ children }) {
       });
       return true;
     },
-    [gameState, currentSpeaker, gracePeriodActive, settings, jumpInCounts, playerTimes]
+    [
+      gameState,
+      currentSpeaker,
+      gracePeriodActive,
+      settings,
+      jumpInCounts,
+      playerTimes,
+    ]
   );
 
   // End grace period early
   const endGracePeriod = useCallback(() => {
     if (gameState !== "playing") return;
     if (!gracePeriodActive) return;
-    
+
     setGracePeriodActive(false);
     setGracePeriodTime(0);
   }, [gameState, gracePeriodActive]);
@@ -94,7 +113,7 @@ export function GameStateProvider({ children }) {
   // Handle speaker finish (next counter-clockwise)
   const handleSpeakerFinish = useCallback(() => {
     if (gameState !== "playing") return;
-    
+
     // If grace period is active, end it early instead of finishing
     if (gracePeriodActive) {
       endGracePeriod();
@@ -102,11 +121,19 @@ export function GameStateProvider({ children }) {
     }
 
     // Move to next counter-clockwise player (going backwards)
-    const nextSpeaker = (currentSpeaker - 1 + settings.playerCount) % settings.playerCount;
+    const nextSpeaker =
+      (currentSpeaker - 1 + settings.playerCount) % settings.playerCount;
     setCurrentSpeaker(nextSpeaker);
     setGracePeriodActive(true);
     setGracePeriodTime(settings.invulnerabilityPeriod);
-  }, [gameState, currentSpeaker, gracePeriodActive, settings.playerCount, endGracePeriod]);
+  }, [
+    gameState,
+    currentSpeaker,
+    gracePeriodActive,
+    settings.playerCount,
+    settings.invulnerabilityPeriod,
+    endGracePeriod,
+  ]);
 
   // Update timers (chess clock style - only current speaker's time counts down)
   const updateTimers = useCallback(() => {
@@ -127,31 +154,38 @@ export function GameStateProvider({ children }) {
     setPlayerTimes((prev) => {
       const newTimes = [...prev];
       const currentTime = newTimes[currentSpeaker];
-      
+
       if (currentTime <= 0.1) {
         // Current speaker's time is up - move to next counter-clockwise player
-        const nextSpeaker = (currentSpeaker - 1 + settings.playerCount) % settings.playerCount;
+        const nextSpeaker =
+          (currentSpeaker - 1 + settings.playerCount) % settings.playerCount;
         setCurrentSpeaker(nextSpeaker);
         setGracePeriodActive(true);
         setGracePeriodTime(settings.invulnerabilityPeriod);
         newTimes[currentSpeaker] = 0;
         return newTimes;
       }
-      
+
       // Only count down if grace period is not active (or if we're counting down during grace period)
       // Actually, let's count down during grace period too, since they're speaking
       newTimes[currentSpeaker] = currentTime - 0.1;
-      
+
       // Check if any player has time left
       const hasTimeLeft = newTimes.some((time) => time > 0);
       if (!hasTimeLeft) {
         // All players out of time - end game
         setGameState("ended");
       }
-      
+
       return newTimes;
     });
-  }, [gameState, gracePeriodActive, currentSpeaker, settings.playerCount]);
+  }, [
+    gameState,
+    gracePeriodActive,
+    currentSpeaker,
+    settings.playerCount,
+    settings.invulnerabilityPeriod,
+  ]);
 
   const value = {
     settings,
@@ -186,4 +220,3 @@ export function useGameState() {
   }
   return context;
 }
-
